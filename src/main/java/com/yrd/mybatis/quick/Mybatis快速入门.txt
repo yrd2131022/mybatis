@@ -1,0 +1,19 @@
+Mybatis开发步骤；
+	1.添加mybatis的坐标
+	2.创建User数据表
+	3.编写user实体类
+	4.编写映射文件UserMapper.xml
+	5.编写核心文件SqlMapConfig.xml
+	6.编写测试类
+
+配置头：
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	
+Mapper头：	
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao_xml.userMapper">
+
+

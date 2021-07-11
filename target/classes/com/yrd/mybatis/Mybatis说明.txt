@@ -1,0 +1,71 @@
+Mybatis开发步骤；
+	1.添加mybatis的坐标
+	2.创建User数据表
+	3.编写user实体类
+	4.编写映射文件UserMapper.xml
+	5.编写核心文件SqlMapConfig.xml
+	6.编写测试类
+	
+	
+注意：事务默认不提交。
+
+
+configuration配置 
+	properties 属性
+	settings 设置
+	typeAliases 类型别名
+	typeHandlers类型处理器
+	objectFactory对象工厂
+	plugins 插件
+	environments环境
+		environment环境变量
+			transactionManager事务管理器
+			dataSource数据源
+	databaseidProvider数据库厂商标识
+	mappers映射器
+	
+	
+typeHandlers开发步骤：
+	1.定义转换类继承类BaseTypeHandler<T>
+	2.覆盖4个为实现的方法，其中setNonNullParameter为java程序设置数据到数据库的回调方法，
+		getNullableResult为查询时 mysql的字符串类型转换成java的Type类型的方法
+	3.在MyBatis核心配置文件中进行注册
+	4.测试转换是否正确
+	
+	
+	
+Mybatis的常用注解
+	@Insert:实现新增
+	@Update：实现更新
+	@Delete：实现删除
+	@Select：实现查询
+	@Result：实现结果集封装
+	@Results：可以与@Result一起使用，封装多个结果集
+	@One：实现一对一结果集封装
+	@Many：实现一对多结果集封装
+	
+	
+	@Results:代替的是标签<resultMap>该注解中可以使用单个@Result注解，也可以使用@Result集合。
+	使用格式：@Results({@Result(),@Result()})
+	
+	
+	@Result:代替了<id>标签和<result>标签
+	@Result中属性介绍：
+		column:数据库的列名
+		property:需要封装的属性名
+		one:需要使用的@One注解（@Result(one=@One)()）
+		many:需要使用的@Many注解（@Result(many=@many)()）
+	
+	@One一对一：代替<assocation>标签，是多表查询的关键，在注解中用来指定子查询返回单一对象。
+	@One注解属性介绍：
+		select:指定用来多表查询的sqlmapper
+		使用格式：@Result(column="",property="",one=@One(select=""))
+		
+	@Many多对一：代替<collection>标签，是多表查询的关键，在注解中用来指定查询返回对象集合。
+		使用格式：@Result(property="",column="",many=@Many(select=""))
+	
+	
+	
+	
+	
+	

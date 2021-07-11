@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<!-- 通过properties标签加载外部properties文件 -->
+	<properties resource="jdbc.properties"></properties>
+	
+	<settings>
+   		<setting name="callSettersOnNulls" value="true"/>
+ 	</settings>
+
+	<!-- 定义别名 -->
+	<typeAliases>
+		<typeAlias type="com.yrd.mybatis.quick.User" alias="user" />
+		
+		<typeAlias type="com.yrd.mybatis.domain.User"
+			alias="user_domain" />
+		<typeAlias type="com.yrd.mybatis.domain.UserWithOrder"
+			alias="userWithOrder_domain" />
+
+		<typeAlias type="com.yrd.mybatis.domain.Order" alias="order_domain" />
+		<typeAlias type="com.yrd.mybatis.domain.Role" alias="role" />
+	</typeAliases>
+
+	<!-- 自定义 ，类型处理器 -->
+	<!-- <typeHandlers> -->
+	<!-- <typeHandler -->
+	<!-- handler="com.yrd.mybatis.handler6.DateTypeHandler" /> -->
+	<!-- </typeHandlers> -->
+	
+	<!-- 配置分页助手插件 -->
+	<plugins>
+		<!-- jsqlparser4.0版本之前这样配置 -->
+		<!-- <plugin interceptor="com.github.pagehelper.PageHelper"> -->
+		<!-- <property name="dialect" value="mysql" /> -->
+		<!-- </plugin> -->
+		<plugin interceptor="com.github.pagehelper.PageInterceptor"></plugin>
+	</plugins>
+
+	<!-- 数据源的环境 -->
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="${jdbc.driver}" />
+				<property name="url" value="${jdbc.url}" />
+				<property name="username" value="${jdbc.username}" />
+				<property name="password" value="${jdbc.password}" />
+			</dataSource>
+		</environment>
+	</environments>
+
+
+
+	<!-- =====start =====加载映射========= -->
+	<!-- 加载映射文件 ,如果用注解的方式，这里就要去掉了。因为不需要写映射文件了 -->
+	<!-- <mappers> -->
+	<!-- <mapper resource="com/yrd/mapper/UserMapper.xml" /> -->
+	<!-- <mapper resource="com/yrd/mapper/OrderMapper.xml" /> -->
+	<!-- <mapper resource="com/yrd/mapper/UserMapper_test.xml" /> -->
+
+	<!-- </mappers> -->
+
+	<!-- 加载映射关系 TODO,使用注解方式，需要如下配置 -->
+	<mappers>
+<!-- 		<mapper resource="com/yrd/mybatis/quick/UserMapper.xml" /> -->
+<!-- 		<mapper resource="com/yrd/mybatis/dao_xml/UserMapper.xml" /> -->
+		<mapper resource="com/yrd/mybatis/dao_xml/UserMapper_proxy.xml" />
+		<mapper resource="com/yrd/mybatis/dao_xml/OrderMapper_proxy.xml" />
+
+		<!-- 扫描，指定接口所在的包,注解方式 -->
+		<package name="com.yrd.mybatis.anno7" />
+	</mappers>
+
+
+
+	<!-- =====end =====加载映射========= -->
+
+
+</configuration>

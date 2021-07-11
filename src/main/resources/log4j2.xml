@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- . 如果使用异步日志，AsyncAppender、AsyncLogger和全局日志，不要同时出现。 -->
+<!-- status="warn" 日志框架本身的输出日志级别 
+	monitorInterval="5" 自动加载配置文件的间隔时间，不低于 5 秒
+-->
+<Configuration status="warn" monitorInterval="5">
+	<!-- 集中配置属性进行管理，使用时通过：${name} -->
+	<properties>
+		<property name="LOG_HOME">D:/logs</property>
+	</properties>
+	
+	<!-- 日志处理器 -->
+	<Appenders>
+		<!-- 控制台输出 appender -->
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] [%-5level] %c{36}:%L --- %m%n" />
+		</Console>
+		
+		<!-- 日志文件输出 appender -->
+		<File name="file" fileName="${LOG_HOME}/myfile.log">
+			<PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] %l%c{36} - %m%n" />
+		</File>
+		
+		<!-- Log4j2提供了两种实现异步日志的方式，一个是通过AsyncAppender，一个是通过AsyncLogger -->
+		<!-- AsyncAppender方式，定义异步日志。这种方式一般不用，因为性能没有提升多少 -->
+		<Async name="Async">
+			<AppenderRef ref="file"/>
+		</Async>
+		
+		<!-- 使用随机读写流的日志文件输出 appender ，性能提高 -->
+		<RandomAccessFile name="accessFile" fileName="${LOG_HOME}/myAcclog.log">
+			<PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] %l%c{36} - %m%n" />
+		</RandomAccessFile>
+		
+		<!-- 按照一定规则拆分的日志文件的 appender -->
+		<RollingFile name="rollingFile" fileName="${LOG_HOME}/myrollog.log"
+			filePattern="D:/logs/$${date:yyyy-MM-dd}/myrollog-%d{yyyyMM-dd-HH-mm}-%i.log">
+			<!-- 日志级别过滤器 -->
+			<ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY" />
+			<!-- 日志消息格式 -->
+			<PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] %l%c{36} - %msg%n" />
+			
+			<Policies>
+			<!-- filePattern="D:/logs/$${date:yyyy-MM-dd}/myrollog-%d{yyyyMM-dd-HH-mm}-%i.log">
+				$${date:yyyy-MM-dd}:以天为单位生成文件夹
+				%d{yyyyMM-dd-HH-mm}：以分钟为单位生成文件
+				%i ：超过 10 MB，生成新的文件（SizeBasedTriggeringPolicy size="10 MB"）
+			 -->
+				<!-- 在系统启动时，发出拆分规则，生产一个新的日志文件 -->
+				<OnStartupTriggeringPolicy />
+				<!-- 按照文件大小拆分，10MB -->
+				<SizeBasedTriggeringPolicy size="10 MB" />
+				<!-- 按照时间的节点拆分，规则根据filePattern定义的 -->
+				<TimeBasedTriggeringPolicy />
+			</Policies>
+			<!-- 在同一个目录下，文件的个数限定为30个，超过进行覆盖 -->
+			<DefaultRolloverStrategy max="30" />
+		</RollingFile>
+		
+		
+		
+	</Appenders>
+	
+	<!-- logger 定义 -->
+	<Loggers>
+	<!-- Log4j2提供了两种实现异步日志的方式，一个是通过AsyncAppender，一个是通过AsyncLogger -->
+	<!-- AsyncLogger方式，定义异步日志。都用这个，性能高 -->
+	<!-- 自定义 异步logger 对象 ,,
+		includeLocation="false" ：关闭日记记录的行号信息，如果没有关闭，性能很低
+		additivity="false" : 不在继承 rootlogger对象
+		name="com.yrd.log":在使用时，参数类型,在name包目录 下，就是使用自定义Logger。
+		public static final Logger LOGGER = LoggerFactory.getLogger(Slf4jTest.class);
+	-->
+		<AsyncLogger name="com.yrd" level="trace"
+				includeLocation="false" additivity="false">
+			<AppenderRef ref="file"/>
+			<AppenderRef ref="Console"/>
+		</AsyncLogger>
+		
+		<!-- 使用 rootLogger 配置  日志级别 -->
+		<Root level="info">
+			<!-- 指定日志使用的处理器 -->
+			<AppenderRef ref="Console" />
+			<!-- 使用异步 appender -->
+			<AppenderRef ref="Async" />
+		</Root>
+	</Loggers>
+	
+</Configuration>

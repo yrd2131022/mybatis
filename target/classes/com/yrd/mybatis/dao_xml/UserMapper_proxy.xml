@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yrd.mybatis.dao_xml_proxy.IUserMapper">
+
+	<!-- sql语句抽取 -->
+	<sql id="selectUser">
+		select t_id id, t_username username,t_password password
+		from tbl_user
+	</sql>
+
+	<!-- resultType=全类名或别名 -->
+	<select id="findAll" resultType="user_domain">
+		<include refid="selectUser"></include>
+		<!-- select t_id id, t_username username,t_password password from tbl_user -->
+	</select>
+
+	<select id="findById" parameterType="int"
+		resultType="user_domain">
+		select t_id id, t_username username,t_password password ,t_birthday birthday
+		from tbl_user where t_id =#{id}
+	</select>
+
+	<!-- <where> 相当于 where 1=1 -->
+	<select id="findByCondition" parameterType="user_domain"
+		resultType="user_domain">
+		select t_id id, t_username username,t_password password from tbl_user
+		<where>
+			<if test="id!=0">
+				and t_id=#{id}
+			</if>
+
+			<if test="username!=null">
+				and t_username=#{username}
+			</if>
+
+			<if test="password!=null">
+				and t_password=#{password}
+			</if>
+
+		</where>
+	</select>
+
+	<select id="findByIds" parameterType="list"
+		resultType="user_domain">
+		select t_id id, t_username username,t_password password from tbl_user
+		<where>
+			<foreach collection="list" open="t_id in(" close=")"
+				item="id" separator=",">
+				#{id}
+			</foreach>
+		</where>
+	</select>
+	
+	<insert id="save" parameterType="user_domain">
+		insert into tbl_user values(#{id},#{username},#{password},#{birthday})
+	</insert>
+	
+	<resultMap type="userWithOrder_domain" id="userMap">
+		<id column="user_id" property="id"/>
+		<result column="t_username" property="username"/>
+		<result column="t_password" property="password"/>
+		<result column="t_birthday" property="birthday"/>
+		<!-- 配置集合private List<Order> orderList; -->
+		<!-- property:集合名称 ..ofType:集合中的数据类型-->
+		<collection property="orderList" ofType="order_domain">
+			<!-- 封装order的数据 -->
+			<id column="order_id" property="id"/>
+			<result column="t_ordertime" property="orderTime"/>
+			<result column="t_total" property="total"/>
+		</collection>
+	</resultMap>
+	
+	<select id="findAllWithOrder" resultMap="userMap">
+		SELECT *,o.t_id order_id,u.t_id user_id FROM tbl_order o  JOIN tbl_user u ON o.t_uid = u.t_id
+	</select>
+	
+	<!-- ==================多对多================== -->
+	<resultMap id="userRoleMap" type="userWithOrder_domain" >
+		<!-- user信息 -->
+		<id column="user_id" property="id"/>
+		<result column="t_username" property="username"/>
+		<result column="t_password" property="password"/>
+		<result column="t_birthday" property="birthday"/>
+		<!-- 配置集合private List<role> roleList; -->
+		<collection property="roleList"  ofType="role">
+			<!-- 封装role的数据 -->
+			<id column="role_id" property="id"/>
+			<result column="roleName" property="roleName"/>
+			<result column="roleDesc" property="roleDesc"/>
+		</collection>
+	
+	</resultMap>
+	<select id="findUserAndRoleAll" resultMap="userRoleMap">
+		SELECT *,u.t_id user_id,r.t_id role_id FROM tbl_user u,tbl_user_role ur,tbl_role r 
+			WHERE u.t_id = ur.t_userid AND r.t_id = ur.t_roleid
+	</select>
+	
+	
+	
+	
+	
+
+	
+	<!-- java.lang.Integer 的别名是 int  ,所有这里可以使用 int -->
+	<delete id="delete" parameterType="java.lang.Integer">
+		delete from tbl_user where t_id = #{id}
+	</delete>
+	
+	<select id="spFindUser" parameterMap="pm" resultType="java.util.LinkedHashMap" statementType="CALLABLE" >
+		call sp_ShowUserInfo(#{userid2,mode=IN},#{username,mode=OUT,jdbcType=VARCHAR},
+		#{ErrorCode,mode=OUT,jdbcType=INTEGER},#{ErrorMessage,mode=OUT,jdbcType=VARCHAR});
+	</select>
+	<parameterMap type="map" id="pm">
+		<parameter property="userid" mode="IN" jdbcType="INTEGER"/>
+		<parameter property="username" mode="OUT" jdbcType="VARCHAR"/>
+		<parameter property="ErrorCode" mode="OUT" jdbcType="INTEGER"/>
+<!-- 		<parameter property="ErrorMessage" mode="OUT" jdbcType="VARCHAR"/> -->
+	</parameterMap>
+	<resultMap type="java.util.LinkedHashMap" id="usermap" autoMapping="true">
+<!--  		<result column="t_id" property="id" jdbcType="INTEGER" javaType="Integer"/>  -->
+<!-- 		<result column="t_username" property="username" jdbcType="VARCHAR" javaType="String"/> -->
+<!-- 		<result column="t_birthday" property="birthday" jdbcType="VARCHAR" javaType="String"/> -->
+	</resultMap>
+	
+	
+	<select id="findMap" parameterType="int" resultType="java.util.LinkedHashMap">
+		select * from tbl_user 
+		
+	</select>
+
+
+
+</mapper>

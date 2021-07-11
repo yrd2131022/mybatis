@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="userMapper">
+
+<!-- resultType=全类名或别名 -->
+	<select id="findAll" resultType="user">
+		select t_id id, t_username username,t_password password from tbl_user
+	</select>
+	
+	<insert id="save" parameterType="com.yrd.mybatis.quick.User">
+		insert into tbl_user values(#{id},#{username},#{password})
+	</insert>
+	
+	<update id="update" parameterType="com.yrd.mybatis.quick.User">
+		update tbl_user set t_username=#{username},t_password=#{password} where t_id =#{id}
+	</update>
+	<!-- java.lang.Integer 的别名是 int  ,所有这里可以使用 int -->
+	<delete id="delete" parameterType="java.lang.Integer">
+		delete from tbl_user where t_id = #{id}
+	</delete>
+	
+	<select id="findById" resultType="user" parameterType="int">
+		select t_id id, t_username username,t_password password from tbl_user where t_id =#{id}
+	</select>
+
+</mapper>

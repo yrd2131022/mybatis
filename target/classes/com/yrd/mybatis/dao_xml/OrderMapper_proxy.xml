@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yrd.mybatis.dao_xml_proxy.IOrderMapper">
+
+	<!-- sql语句抽取 -->
+	<sql id="selectOrder">
+		select t_id id, t_ordertime ordertime,t_total total,t_uid uid
+		from tbl_order
+	</sql>
+	
+	
+	<resultMap type="order_domain" id="orderMap">
+		<!-- 手动指定字段与实体属性的映射关系 -->
+		<!-- column:数据表的字段名称,property:实体的属性名称 -->
+		<id column="order_id" property="id"/>
+		<result column="t_ordertime" property="orderTime"/>
+		<result column="t_total" property="total"/>
+		
+<!-- 		<result column="user_id" property="user.id"/> -->
+<!-- 		<result column="t_username" property="user.username"/> -->
+<!-- 		<result column="t_password" property="user.password"/> -->
+<!-- 		<result column="t_birthday" property="user.birthday"/> -->
+		
+		<!-- property:实体（order_domain）中的属性名称(private User user;), 
+			javaType:当前实体（order_domain）中的属性的类型（User）-->
+		<association property="user" javaType="user_domain">
+			<id column="user_id" property="id"/>
+			<result column="t_username" property="username"/>
+			<result column="t_password" property="password"/>
+			<result column="t_birthday" property="birthday"/>
+		</association>
+	
+	</resultMap>
+
+	<!-- 表一对一查询 -->
+	<select id="findAll" resultMap="orderMap">
+		SELECT *,o.t_id order_id,u.t_id user_id FROM tbl_order o  JOIN tbl_user u ON o.t_uid = u.t_id
+	</select>
+
+	
+
+
+</mapper>
